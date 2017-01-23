@@ -8,11 +8,22 @@
   with_items: rvm1_rubies
   when: rvm1_rubies
 
+# Install rubies in a sudo environment (not docker)
+
 - name: Install rubies
   command: '{{ rvm1_rvm }} install {{ item.item }} {{ rvm1_ruby_install_flags }}'
-  when: rvm1_rubies and item.rc != 0
+  when: rvm1_rubies and item.rc != 0 and use_sudo
   with_items: detect_rubies.results
   sudo_user: '{{ rvm1_user }}'
+
+# Or Install RVM in a non sudo environment (e.g docker)
+
+- name: Install rubies
+  command: '{{ rvm1_rvm }} install {{ item.item }} {{ rvm1_ruby_install_flags }}'
+  when: rvm1_rubies and item.rc != 0 and not use_sudo
+  with_items: detect_rubies.results
+
+# End
 
 - name: Detect default ruby version
   command: '{{ rvm1_rvm }} alias list default'
